@@ -12,12 +12,12 @@ Interactive research presentation and live simulation platform developed for **I
 
 ## 👥 Authors & Affiliation
 
-- **Slock Ahuja** *(Lead Researcher & Presenter)*
-- **Prof. Dr. Praveen Kumar Sharma** *(Research Mentor & Co-Author)*
-- **Dr. C. D. Parmar** *(Co-Author)*
-- **Indu Jaiswal** *(Co-Author)*
+- **Slock Ahuja** *(Lead Researcher & Presenter, Marwadi University)*
+- **Prof. Dr. Praveen Kumar Sharma** *(Research Supervisor & Co-Author; Head of Department (ECE), MIT, Pune)*
+- **Dr. C. D. Parmar** *(Co-Author, Marwadi University)*
+- **Indu Jaiswal** *(Co-Author, Marwadi University)*
 
-**Department of Information and Communication Technology, Marwadi University, Gujarat, India**
+**Official Publication Affiliation:** Department of Information and Communication Technology, Marwadi University, Gujarat, India
 
 ---
 

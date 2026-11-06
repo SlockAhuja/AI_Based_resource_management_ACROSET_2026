@@ -2,9 +2,8 @@
 
 **Paper ID:** 272  
 **Title:** AI-Enabled Resource Management for Non-Terrestrial Network Integrated 6G Communication Systems  
-**Presenter:** Slock Ahuja  
-**Research Mentor / Supervisor:** Prof. Dr. Praveen Kumar Sharma  
-**Affiliation:** Department of Information and Communication Technology, Marwadi University  
+**Lead Researcher & Presenter:** Slock Ahuja (Department of ICT, Marwadi University, Gujarat, India)  
+**Research Supervisor & Mentor:** Prof. Dr. Praveen Kumar Sharma (Head of Department, ECE, MIT, Pune, Maharashtra, India)  
 **Conference:** IEEE ACROSET 2026, 12–13 September 2026, Indore, Madhya Pradesh, India  
 
 ---

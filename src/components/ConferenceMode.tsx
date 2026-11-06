@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LiveDemoSection } from './LiveDemoSection';
 import { presenterProfile } from '../config/profile';
-import { reportedResearchMetrics, paperDetails } from '../data/researchResults';
+import { reportedResearchMetrics } from '../data/researchResults';
+import { slideSpeeches, technicalQAList, TechnicalQAItem } from '../data/presentationSpeech';
 import {
   Presentation,
   ChevronLeft,
   ChevronRight,
-  Maximize2,
   X,
   Play,
   Award,
@@ -16,7 +16,14 @@ import {
   Sparkles,
   Layers,
   CheckCircle2,
-  Scale
+  FileText,
+  HelpCircle,
+  Clock,
+  ArrowRight,
+  Search,
+  MessageSquare,
+  BookOpen,
+  Filter,
 } from 'lucide-react';
 
 interface ConferenceModeProps {
@@ -25,38 +32,18 @@ interface ConferenceModeProps {
 
 export const ConferenceMode: React.FC<ConferenceModeProps> = ({ onExit }) => {
   const [currentSlide, setCurrentSlide] = useState<number>(0);
+  const [showNotes, setShowNotes] = useState<boolean>(false);
+  const [showQA, setShowQA] = useState<boolean>(false);
+  const [qaCategoryFilter, setQaCategoryFilter] = useState<string>('All');
+  const [qaSearchQuery, setQaSearchQuery] = useState<string>('');
 
   const slides = [
-    {
-      id: 'title',
-      title: 'Title & Introduction',
-      icon: Award,
-    },
-    {
-      id: 'problem',
-      title: 'Problem & Dynamic 6G NTN',
-      icon: Layers,
-    },
-    {
-      id: 'ai-ppo',
-      title: 'PPO AI Decision Engine',
-      icon: Cpu,
-    },
-    {
-      id: 'live-demo',
-      title: 'Live Interactive Simulation',
-      icon: Play,
-    },
-    {
-      id: 'results',
-      title: 'Experimental Research Results',
-      icon: BarChart3,
-    },
-    {
-      id: 'conclusion',
-      title: 'Key Takeaways & Summary',
-      icon: CheckCircle2,
-    }
+    { id: 'title', title: 'Title & Introduction', icon: Award },
+    { id: 'problem', title: 'Problem & Dynamic 6G NTN', icon: Layers },
+    { id: 'ai-ppo', title: 'PPO AI Decision Engine', icon: Cpu },
+    { id: 'live-demo', title: 'Live Interactive Simulation', icon: Play },
+    { id: 'results', title: 'Experimental Research Results', icon: BarChart3 },
+    { id: 'conclusion', title: 'Key Takeaways & Summary', icon: CheckCircle2 },
   ];
 
   const handleNext = () => {
@@ -66,6 +53,42 @@ export const ConferenceMode: React.FC<ConferenceModeProps> = ({ onExit }) => {
   const handlePrev = () => {
     setCurrentSlide((prev) => (prev > 0 ? prev - 1 : prev));
   };
+
+  // Keyboard navigation for conference presentation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in input
+      if ((e.target as HTMLElement).tagName === 'INPUT') return;
+
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        handleNext();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        handlePrev();
+      } else if (e.key === 'n' || e.key === 'N') {
+        setShowNotes((prev) => !prev);
+      } else if (e.key === 'q' || e.key === 'Q') {
+        setShowQA((prev) => !prev);
+      } else if (e.key === 'Escape') {
+        if (showQA) setShowQA(false);
+        else if (showNotes) setShowNotes(false);
+        else onExit();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentSlide, showQA, showNotes]);
+
+  const activeSpeech = slideSpeeches[currentSlide] || slideSpeeches[0];
+
+  const filteredQA = technicalQAList.filter((item) => {
+    const matchesCategory =
+      qaCategoryFilter === 'All' || item.category === qaCategoryFilter;
+    const matchesSearch =
+      item.question.toLowerCase().includes(qaSearchQuery.toLowerCase()) ||
+      item.answer.toLowerCase().includes(qaSearchQuery.toLowerCase()) ||
+      item.keyTakeaway.toLowerCase().includes(qaSearchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950 text-white flex flex-col overflow-hidden select-none">
@@ -86,12 +109,13 @@ export const ConferenceMode: React.FC<ConferenceModeProps> = ({ onExit }) => {
           <div className="hidden md:flex items-center gap-2 text-xs text-slate-300">
             <span>Presenter:</span>
             <strong className="text-white">{presenterProfile.name}</strong>
-            <span className="text-slate-500">({presenterProfile.affiliation.institution})</span>
+            <span className="text-slate-400">({presenterProfile.affiliation.institution})</span>
           </div>
         </div>
 
-        {/* Slide Indicator & Quick Jumper */}
+        {/* Slide Indicator & Fast Switchers */}
         <div className="flex items-center gap-2">
+          {/* Slide Tabs */}
           <div className="hidden lg:flex items-center gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700">
             {slides.map((s, index) => {
               const Icon = s.icon;
@@ -112,18 +136,54 @@ export const ConferenceMode: React.FC<ConferenceModeProps> = ({ onExit }) => {
             })}
           </div>
 
+          {/* Speaker Notes Toggle Pill */}
+          <button
+            onClick={() => setShowNotes(!showNotes)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
+              showNotes
+                ? 'bg-cyan-500 text-slate-950 border-cyan-400 font-black shadow-md'
+                : 'bg-slate-800 border-slate-700 text-cyan-300 hover:bg-slate-700'
+            }`}
+            title="Toggle Spoken Speech Notes (Press N)"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Speaker Notes</span>
+            <kbd className="hidden sm:inline px-1 py-0.2 text-[9px] bg-slate-900/60 rounded border border-slate-600">
+              N
+            </kbd>
+          </button>
+
+          {/* Q&A Defense Toggle Pill */}
+          <button
+            onClick={() => setShowQA(!showQA)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
+              showQA
+                ? 'bg-amber-400 text-slate-950 border-amber-300 font-black shadow-md'
+                : 'bg-slate-800 border-slate-700 text-amber-300 hover:bg-slate-700'
+            }`}
+            title="Open Technical Q&A Defense Guide (Press Q)"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Q&A Defense</span>
+            <kbd className="hidden sm:inline px-1 py-0.2 text-[9px] bg-slate-900/60 rounded border border-slate-600">
+              Q
+            </kbd>
+          </button>
+
+          {/* Exit Presentation */}
           <button
             onClick={onExit}
-            className="flex items-center gap-1.5 px-4 py-2 bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold rounded-xl transition-colors ml-2"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold rounded-xl transition-colors ml-1"
+            title="Exit Conference Presentation Mode (Press Esc)"
           >
             <X className="w-4 h-4" />
-            <span>Exit Conference Mode</span>
+            <span className="hidden sm:inline">Exit</span>
           </button>
         </div>
       </header>
 
       {/* Main Slide Content Area */}
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex items-center justify-center relative">
         <div className="w-full max-w-6xl mx-auto h-full flex flex-col justify-center">
           {/* SLIDE 0: TITLE SLIDE */}
           {currentSlide === 0 && (
@@ -139,13 +199,26 @@ export const ConferenceMode: React.FC<ConferenceModeProps> = ({ onExit }) => {
                 <span className="text-orange-500">6G Communication Systems</span>
               </h1>
 
-              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 max-w-2xl mx-auto space-y-2">
-                <p className="text-xs uppercase font-bold text-slate-400 tracking-wider">Presenter</p>
-                <p className="text-2xl font-bold font-display text-white">{presenterProfile.name}</p>
-                <p className="text-sm font-semibold text-blue-400">{presenterProfile.affiliation.department}</p>
-                <p className="text-xs text-slate-400">{presenterProfile.affiliation.institution}, {presenterProfile.affiliation.state}, {presenterProfile.affiliation.country}</p>
+              {/* Presenter Portrait & Identity Box */}
+              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 max-w-2xl mx-auto flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left shadow-2xl">
+                <img
+                  src={presenterProfile.image}
+                  alt={presenterProfile.name}
+                  className="w-20 h-24 rounded-xl object-cover object-[center_15%] border-2 border-blue-500 shadow-md shrink-0"
+                />
+                <div className="space-y-1">
+                  <p className="text-[11px] uppercase font-bold text-blue-400 tracking-wider">
+                    Conference Presenter & Lead Author
+                  </p>
+                  <p className="text-2xl font-bold font-display text-white">{presenterProfile.name}</p>
+                  <p className="text-sm font-semibold text-slate-300">{presenterProfile.affiliation.department}</p>
+                  <p className="text-xs text-slate-400">
+                    {presenterProfile.affiliation.institution}, {presenterProfile.affiliation.state}, {presenterProfile.affiliation.country}
+                  </p>
+                </div>
               </div>
 
+              {/* Presentation Metadata Pills */}
               <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto text-left text-xs">
                 <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
                   <p className="text-slate-400">Conference</p>
@@ -217,7 +290,7 @@ export const ConferenceMode: React.FC<ConferenceModeProps> = ({ onExit }) => {
                   Proposed Solution: PPO Reinforcement Learning
                 </h2>
                 <p className="text-slate-400 text-sm">
-                  Continuous multi-dimensional state observation $\to$ Actor-Critic Policy Optimization.
+                  Continuous multi-dimensional state observation &rarr; Actor-Critic Policy Optimization.
                 </p>
               </div>
 
@@ -280,7 +353,7 @@ export const ConferenceMode: React.FC<ConferenceModeProps> = ({ onExit }) => {
                   Experimental Research Findings (Paper 272)
                 </h2>
                 <p className="text-slate-400 text-sm">
-                  Evaluated across ~12,000 communication samples.
+                  Evaluated across ~12,000 realistic NTN communication samples.
                 </p>
               </div>
 
@@ -343,6 +416,185 @@ export const ConferenceMode: React.FC<ConferenceModeProps> = ({ onExit }) => {
             </div>
           )}
         </div>
+
+        {/* SPEAKER NOTES SLIDE-OUT DRAWER */}
+        {showNotes && (
+          <aside className="absolute top-4 right-4 bottom-4 w-96 max-w-[90vw] bg-slate-900/95 backdrop-blur-xl border border-cyan-500/40 rounded-3xl p-6 shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-200 z-30">
+            <div className="overflow-y-auto space-y-4 pr-1">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-400">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-xs text-white">Speaker Teleprompter</h3>
+                    <p className="text-[10px] text-slate-400">Slide {currentSlide + 1}: {activeSpeech.title}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {activeSpeech.duration}
+                  </span>
+                  <button
+                    onClick={() => setShowNotes(false)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Spoken Word Script */}
+              <div className="space-y-1.5">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-cyan-400">
+                  Verbatim Spoken Script:
+                </p>
+                <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-200 leading-relaxed font-sans select-text">
+                  {activeSpeech.spokenScript}
+                </div>
+              </div>
+
+              {/* Transition Cue */}
+              <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 text-xs">
+                <p className="font-bold text-amber-300 flex items-center gap-1 mb-1 text-[11px]">
+                  <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  Transition Cue to Next Slide:
+                </p>
+                <p className="text-slate-300 italic text-[11px]">
+                  "{activeSpeech.transitionCue}"
+                </p>
+              </div>
+
+              {/* Key Bullets Checklist */}
+              <div className="space-y-2">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Key Takeaway Checklist:
+                </p>
+                <ul className="space-y-1 text-xs text-slate-300">
+                  {activeSpeech.keyBullets.map((bullet, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5 shrink-0" />
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-800 text-center">
+              <span className="text-[10px] text-slate-500">
+                Press <kbd className="px-1 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">N</kbd> or Escape to close teleprompter
+              </span>
+            </div>
+          </aside>
+        )}
+
+        {/* TECHNICAL Q&A DEFENSE MODAL */}
+        {showQA && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
+            <div className="w-full max-w-4xl max-h-[90vh] bg-slate-900 border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col justify-between overflow-hidden">
+              <div className="overflow-y-auto space-y-5 pr-1">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400">
+                      <HelpCircle className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold font-display text-white">
+                        Technical Q&A Defense Guide
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        Top conference reviewer questions and authoritative model defense answers (ACROSET 2026 Paper 272)
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowQA(false)}
+                    className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Search Bar & Category Filters */}
+                <div className="space-y-3">
+                  <div className="relative">
+                    <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Search questions (e.g. Doppler, PPO, 12,000, 550 km, latency, reward)..."
+                      value={qaSearchQuery}
+                      onChange={(e) => setQaSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {['All', 'PPO & RL', 'NTN Architecture', 'Simulation & Dataset', 'Results & Benchmarks'].map(
+                      (cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => setQaCategoryFilter(cat)}
+                          className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                            qaCategoryFilter === cat
+                              ? 'bg-amber-400 text-slate-950 font-bold shadow-sm'
+                              : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+                          }`}
+                        >
+                          {cat}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+
+                {/* Questions List */}
+                <div className="space-y-3 pt-2">
+                  {filteredQA.length === 0 ? (
+                    <div className="p-8 text-center text-slate-400 text-xs">
+                      No matching questions found for "{qaSearchQuery}". Try clearing search.
+                    </div>
+                  ) : (
+                    filteredQA.map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2 hover:border-slate-700 transition-colors"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-700">
+                            {item.category} • Q{item.id}
+                          </span>
+                          <span className="text-[10px] font-bold text-slate-400 italic">
+                            Paper 272 Defense
+                          </span>
+                        </div>
+                        <h4 className="text-sm font-bold text-white leading-snug">
+                          {item.question}
+                        </h4>
+                        <p className="text-xs text-slate-300 leading-relaxed">
+                          {item.answer}
+                        </p>
+                        <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-200 font-semibold flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <span><strong>Key Takeaway:</strong> {item.keyTakeaway}</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-800 text-center">
+                <span className="text-xs text-slate-500">
+                  Press <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">Q</kbd> or Escape to close Q&A Defense Guide
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Bottom Slide Controller Navigation */}
@@ -357,7 +609,8 @@ export const ConferenceMode: React.FC<ConferenceModeProps> = ({ onExit }) => {
         </button>
 
         <div className="text-xs font-mono text-slate-400">
-          Slide <strong className="text-white">{currentSlide + 1}</strong> of {slides.length} — {slides[currentSlide].title}
+          Slide <strong className="text-white">{currentSlide + 1}</strong> of {slides.length} —{' '}
+          <span className="text-slate-300">{slides[currentSlide].title}</span>
         </div>
 
         <button

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
+import { AuthorsSection } from './components/AuthorsSection';
 import { ResearcherProfile } from './components/ResearcherProfile';
 import { SupervisorSection } from './components/SupervisorSection';
-import { AuthorsSection } from './components/AuthorsSection';
 import { ProblemSection } from './components/ProblemSection';
 import { ArchitectureSection } from './components/ArchitectureSection';
 import { AiPipelineSection } from './components/AiPipelineSection';
@@ -52,14 +52,14 @@ export const App: React.FC = () => {
               onLaunchDemoClick={() => scrollToSection('live-demo')}
             />
 
-            {/* SECTION 2: RESEARCHER PROFILE (Slock Ahuja) */}
+            {/* SECTION 2: RESEARCH TEAM & ACADEMIC COLLABORATION (Two Featured Researchers + Visual Synergy Bridge) */}
+            <AuthorsSection />
+
+            {/* SECTION 3: LEAD RESEARCHER PROFILE (Slock Ahuja) */}
             <ResearcherProfile />
 
-            {/* SECTION 3: RESEARCH SUPERVISOR (Prof. Dr. Praveen Kumar Sharma) */}
+            {/* SECTION 4: RESEARCH SUPERVISOR (Prof. Dr. Praveen Kumar Sharma) */}
             <SupervisorSection />
-
-            {/* SECTION 4: AUTHORS OF PAPER 272 */}
-            <AuthorsSection />
 
             {/* SECTION 5: PROBLEM STATEMENT & CHALLENGES */}
             <ProblemSection />

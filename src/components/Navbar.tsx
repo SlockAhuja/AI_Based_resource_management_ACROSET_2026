@@ -20,13 +20,13 @@ export const Navbar: React.FC<NavbarProps> = ({ isPresentationMode, onTogglePres
   }, []);
 
   const navLinks = [
-    { name: 'Research', href: '#problem', icon: BookOpen },
+    { name: 'Research Team', href: '#authors', icon: Users },
+    { name: 'Problem', href: '#problem', icon: BookOpen },
     { name: 'Architecture', href: '#architecture', icon: Layers },
     { name: 'AI Pipeline', href: '#ai-pipeline', icon: Radio },
     { name: 'Live Demo', href: '#live-demo', icon: Play, highlight: true },
     { name: 'AI vs Baseline', href: '#ai-vs-baseline', icon: BarChart3 },
     { name: 'Results', href: '#results', icon: BarChart3 },
-    { name: 'Authors', href: '#authors', icon: Users },
   ];
 
   if (isPresentationMode) {

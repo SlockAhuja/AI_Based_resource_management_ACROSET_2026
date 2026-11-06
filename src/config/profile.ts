@@ -1,16 +1,40 @@
 /**
  * Slock Ahuja - Researcher Profile Configuration
- * Centralized configuration for presenter and author profiles.
- * Replace placeholder constants with your actual profile links when ready.
+ * Centralized configuration for Lead Researcher and Presenter.
+ * Official verified profile URLs for IEEE ACROSET 2026.
  */
 
-export const SLOCK_LINKEDIN_URL: string = "SLOCK_LINKEDIN_URL";
-export const SLOCK_GITHUB_URL: string = "https://github.com/SlockAhuja";
+// Verified Profile & Social URLs
+export const SLOCK_NAME: string = "Slock Ahuja";
+export const SLOCK_DESIGNATION: string = "Lead Researcher | Research Paper Presenter";
+export const SLOCK_ROLE: string = "Lead Author & Conference Presenter";
+export const SLOCK_INSTITUTION: string = "Marwadi University";
+export const SLOCK_DEPARTMENT: string = "Department of Information and Communication Technology";
+export const SLOCK_LOCATION: string = "Gujarat, India";
+
 export const SLOCK_EMAIL: string = "slockahuja321@gmail.com";
+export const SLOCK_GOOGLE_SCHOLAR_URL: string = "https://scholar.google.com/citations?user=f4EQzx4AAAAJ";
+export const SLOCK_LINKEDIN_URL: string = "https://www.linkedin.com/in/slock-ahuja-32839b315/";
+export const SLOCK_GITHUB_URL: string = "https://github.com/SlockAhuja";
+export const SLOCK_PERSONAL_WEBSITE_URL: string = "https://slockahuja.github.io/AI_Based_resource_management/";
+export const SLOCK_IMAGE_URL: string = "./images/slock-ahuja.jpg";
+
+export const SLOCK_RESEARCH_INTERESTS: string[] = [
+  "Artificial Intelligence",
+  "Non-Terrestrial Networks",
+  "6G Communication Systems",
+  "Satellite Communications",
+  "Reinforcement Learning",
+  "Wireless Resource Management",
+  "Machine Learning",
+];
 
 export interface ResearcherProfile {
   name: string;
+  designation: string;
   role: string;
+  title: string;
+  image: string;
   affiliation: {
     department: string;
     institution: string;
@@ -18,9 +42,10 @@ export interface ResearcherProfile {
     country: string;
   };
   email: string;
+  googleScholar: string;
   linkedin: string;
   github: string;
-  googleScholar?: string;
+  website: string;
   bio: string;
   researchInterests: string[];
   conference: {
@@ -34,27 +59,24 @@ export interface ResearcherProfile {
 }
 
 export const presenterProfile: ResearcherProfile = {
-  name: "Slock Ahuja",
-  role: "Student Researcher & Presenter",
+  name: SLOCK_NAME,
+  designation: SLOCK_DESIGNATION,
+  role: SLOCK_ROLE,
+  title: "Lead Researcher & Presenter",
+  image: SLOCK_IMAGE_URL,
   affiliation: {
-    department: "Department of Information and Communication Technology",
-    institution: "Marwadi University",
+    department: SLOCK_DEPARTMENT,
+    institution: SLOCK_INSTITUTION,
     state: "Gujarat",
     country: "India",
   },
   email: SLOCK_EMAIL,
+  googleScholar: SLOCK_GOOGLE_SCHOLAR_URL,
   linkedin: SLOCK_LINKEDIN_URL,
   github: SLOCK_GITHUB_URL,
-  bio: "Undergraduate researcher at Marwadi University specializing in Next-Generation Non-Terrestrial Networks (NTN), 6G communication architectures, and AI-driven radio resource management algorithms. Lead author and presenter of Paper 272 at IEEE ACROSET 2026.",
-  researchInterests: [
-    "6G Communication Systems",
-    "Non-Terrestrial Networks (NTN)",
-    "Artificial Intelligence & Machine Learning",
-    "Deep Reinforcement Learning (PPO / DRL)",
-    "Wireless Communication & Signal Processing",
-    "Satellite Communication & LEO Constellations",
-    "Intelligent Dynamic Resource Management",
-  ],
+  website: SLOCK_PERSONAL_WEBSITE_URL,
+  bio: "Lead researcher and conference presenter for IEEE ACROSET 2026 Paper 272 at Marwadi University. Formulated the multi-tier deep reinforcement learning policy with Proximal Policy Optimization (PPO), developed the end-to-end 3GPP Non-Terrestrial Network simulation environment, and empirically evaluated over 12,000 realistic communication samples.",
+  researchInterests: SLOCK_RESEARCH_INTERESTS,
   conference: {
     name: "IEEE ACROSET 2026",
     paperId: "272",
